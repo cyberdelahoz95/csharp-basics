@@ -1,13 +1,24 @@
 using System;
 using CoreEscuela.Entities;
 using static System.Console;
+using System.Collections.Generic;
+using System.Linq;
+using CoreEscuela.Util;
 
 namespace CoreEscuela {
     class Program {
         static void Main (string[] args) {
-            var engine = new SchoolEngine();
-            engine.Init();
-            printSchoolCourses(engine.MySchool);
+            var engine = new SchoolEngine ();
+            engine.Init ();
+            printSchoolCourses (engine.MySchool);
+
+            var objectsList = engine.GetBaseInstances (out int counterStudents,
+                out int counterSurveys,
+                out int dummy,
+                out dummy);
+            //var IVenueList = from obj in objectsList where obj is IVenue select (IVenue) obj;
+
+            engine.MySchool.ClenAddress ();
 
             /*miEscuela.Courses = new Course[] {
                 new Course () { Name = "101" },
@@ -74,7 +85,7 @@ namespace CoreEscuela {
             };
             PrintCoursesWhile (coursesArray); */
         }
- 
+
         /*private static bool PredicateForRemoving (Course currentCourse) {
             return (currentCourse.Name == "Temp");
         }*/

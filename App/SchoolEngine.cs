@@ -27,8 +27,25 @@ namespace CoreEscuela {
             LoadTests ();
         }
 
+        #region Loading Methods
         private void LoadTests () {
-            throw new NotImplementedException ();
+            foreach (var curso in MySchool.CoursesList) {
+                foreach (var asignatura in curso.Subjects) {
+                    foreach (var alumno in curso.Students) {
+                        var rnd = new Random (System.Environment.TickCount);
+
+                        for (int i = 0; i < 5; i++) {
+                            var ev = new Tests {
+                                ItsSubject = asignatura,
+                                Name = $"{asignatura.Name} Ev#{i + 1}",
+                                grade = (float) (5 * rnd.NextDouble ()),
+                                By = alumno
+                            };
+                            alumno.Surveys.Add (ev);
+                        }
+                    }
+                }
+            }
         }
 
         private void LoadSubjects () {
@@ -41,18 +58,6 @@ namespace CoreEscuela {
                 };
                 course.Subjects = subjectList;
             }
-        }
-
-        private List<Student> GenerateStudentsRandomly (int size) {
-            string[] name1 = { "Alba", "Felipa", "Eusebio", "Farid", "Donald", "Alvaro", "Nicolás" };
-            string[] lastName1 = { "Ruiz", "Sarmiento", "Uribe", "Maduro", "Trump", "Toledo", "Herrera" };
-            string[] name2 = { "Freddy", "Anabel", "Rick", "Murty", "Silvana", "Diomedes", "Nicomedes", "Teodoro" };
-
-            var studentsList = from n1 in name1
-            from n2 in name2
-            from ln1 in lastName1
-            select new Student { Name = $"{n1} {n2} {ln1}" };
-            return studentsList.OrderBy ((student) => student.UniqueId).Take (size).ToList ();
         }
 
         private void LoadCourses () {
@@ -68,6 +73,99 @@ namespace CoreEscuela {
                 randomNumber = rnd.Next (5, 20);
                 course.Students = GenerateStudentsRandomly (randomNumber);
             }
+        }
+
+        #endregion
+        private List<Student> GenerateStudentsRandomly (int size) {
+            string[] name1 = { "Alba", "Felipa", "Eusebio", "Farid", "Donald", "Alvaro", "Nicolás" };
+            string[] lastName1 = { "Ruiz", "Sarmiento", "Uribe", "Maduro", "Trump", "Toledo", "Herrera" };
+            string[] name2 = { "Freddy", "Anabel", "Rick", "Murty", "Silvana", "Diomedes", "Nicomedes", "Teodoro" };
+
+            var studentsList = from n1 in name1
+            from n2 in name2
+            from ln1 in lastName1
+            select new Student { Name = $"{n1} {n2} {ln1}" };
+            return studentsList.OrderBy ((student) => student.UniqueId).Take (size).ToList ();
+        }
+
+        public List<BaseObject> GetBaseInstances (
+            out int counterStudents,
+            out int counterSurveys,
+            out int counterSubjects,
+            out int counterCourses,
+            bool includesSurveys = true,
+            bool includesStudents = true,
+            bool includesSubjects = true,
+            bool includesCourses = true) {
+            var listaObj = new List<BaseObject> ();
+            listaObj.Add (MySchool);
+            listaObj.AddRange (MySchool.CoursesList);
+            counterCourses = counterSurveys = counterSubjects = counterStudents = 0;
+            if (includesCourses) {
+                counterCourses = MySchool.CoursesList.Count;
+                foreach (var curso in MySchool.CoursesList) {
+                    if (includesSubjects) {
+                        listaObj.AddRange (curso.Subjects);
+                        counterSubjects += curso.Subjects.Count;
+                    }
+
+                    if (includesStudents) {
+                        listaObj.AddRange (curso.Students);
+                        counterStudents += curso.Students.Count;
+                    }
+                    if (includesSurveys) {
+                        foreach (var alumno in curso.Students) {
+                            counterSurveys += alumno.Surveys.Count;
+                            listaObj.AddRange (alumno.Surveys);
+                        }
+                    }
+                }
+            }
+
+            return listaObj;
+        }
+        public List<BaseObject> GetBaseInstances () {
+            var listaObj = new List<BaseObject> ();
+            listaObj.Add (MySchool);
+            listaObj.AddRange (MySchool.CoursesList);
+
+            foreach (var curso in MySchool.CoursesList) {
+                listaObj.AddRange (curso.Subjects);
+                listaObj.AddRange (curso.Students);
+
+                foreach (var alumno in curso.Students) {
+                    listaObj.AddRange (alumno.Surveys);
+                }
+            }
+
+            return listaObj;
+        }
+
+        public (List<BaseObject>, int) GetBaseInstances (
+            bool includesSurveys = true,
+            bool includesStudents = true,
+            bool includesSubjects = true,
+            bool includesCourses = true) {
+            var listaObj = new List<BaseObject> ();
+            listaObj.Add (MySchool);
+            listaObj.AddRange (MySchool.CoursesList);
+            int counterSurvers = 0;
+            if (includesCourses) {
+                foreach (var curso in MySchool.CoursesList) {
+                    if (includesSubjects)
+                        listaObj.AddRange (curso.Subjects);
+                    if (includesStudents)
+                        listaObj.AddRange (curso.Students);
+                    if (includesSurveys) {
+                        foreach (var alumno in curso.Students) {
+                            counterSurvers++;
+                            listaObj.AddRange (alumno.Surveys);
+                        }
+                    }
+                }
+            }
+
+            return (listaObj, counterSurvers);
         }
     }
 }

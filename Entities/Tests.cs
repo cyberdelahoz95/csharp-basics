@@ -1,12 +1,10 @@
 using System;
 
-namespace CoreEscuela.Entities
-{
-    public class Tests
-    {
-        public string UniqueId { get; private set; }
+namespace CoreEscuela.Entities {
+    public class Tests : BaseObject {
+        //public string UniqueId { get; private set; }
 
-        public string Name { get; set; }
+        //public string Name { get; set; }
 
         public Student By { get; set; }
 
@@ -14,7 +12,7 @@ namespace CoreEscuela.Entities
 
         public float grade { get; set; }
 
-        public Tests() => UniqueId = Guid.NewGuid().ToString();
+        //public Tests() => UniqueId = Guid.NewGuid().ToString();
 
     }
 }
